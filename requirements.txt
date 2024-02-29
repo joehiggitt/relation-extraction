@@ -1,4 +1,7 @@
 numpy
-scipy
 pandas
+matplotlib
 tensorflow
+scikit-learn
+pyyaml
+h5py
