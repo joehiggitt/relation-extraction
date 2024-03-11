@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import Model
-from tensorflow.keras.layers import (InputLayer, TextVectorization, Embedding,
-    Bidirectional, LSTM, Dense)
+from tensorflow.keras.layers import (Bidirectional, Dense, Embedding,
+    InputLayer, LSTM, TextVectorization)
 
 
 class RelExLSTM(Model):
@@ -41,21 +41,27 @@ class RelExLSTM(Model):
         super(RelExLSTM, self).__init__()
 
         # Input Layer
-        self.input_layer = InputLayer(name="Input", input_shape=(1,), dtype=tf.string)
+        self.input_layer = InputLayer(name="Input", input_shape=(1,),
+            dtype=tf.string)
 
         # Text Vectorisation Layer
         if use_vocab:
-            self.vectoriser = TextVectorization(name="TextVectorisation", vocabulary=vocab, output_sequence_length=max_len)
+            self.vectoriser = TextVectorization(name="TextVectorisation",
+                vocabulary=vocab, output_sequence_length=max_len)
         else:
-            self.vectoriser = TextVectorization(name="TextVectorisation", max_tokens=vocab_size, output_sequence_length=max_len)
+            self.vectoriser = TextVectorization(name="TextVectorisation",
+                max_tokens=vocab_size, output_sequence_length=max_len)
             self.vectoriser.adapt(vocab)
             
         # Text Embedding Layer
-        self.embedding = Embedding(vocab_size, embedding_size, input_length=max_len, name="Embedding")
+        self.embedding = Embedding(vocab_size, embedding_size,
+            input_length=max_len, name="Embedding")
         
         # Bidirection LSTM Layers
-        self.lstm = Bidirectional(LSTM(lstm_units, dropout=0.7, recurrent_dropout=0.7), name="BidirectionalLSTM")
-        self.dense = Dense(num_labels, activation='softmax', name="FullyConnected")
+        self.lstm = Bidirectional(LSTM(lstm_units, dropout=0.7,
+            recurrent_dropout=0.7), name="BidirectionalLSTM")
+        self.dense = Dense(num_labels, activation='softmax',
+            name="FullyConnected")
 
     def call(self, inputs):
         x = self.input_layer(inputs)
