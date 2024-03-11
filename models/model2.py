@@ -3,8 +3,8 @@ from tensorflow.keras import Input, Model
 from tensorflow.keras.layers import (Bidirectional, Concatenate, Dense,
     Embedding, LSTM, TextVectorization)
 
-def create_RelExLSTM(text_embed_size: int, pos_embed_size: int,
-    lstm_units: int, max_len: int, num_labels: int, vocab_size: int):
+def create_RelExLSTM(text_embed_size: int, pos_embed_size: int, lstm_units:
+    int, max_len: int, num_labels: int, vocab_size: int) -> Model:
     """
     Constructs a Bidirectional LSTM neural network, desgined for
     identifying relations in sentences
@@ -52,12 +52,12 @@ def create_RelExLSTM(text_embed_size: int, pos_embed_size: int,
         name="Pos2Embedding")(pos2_input)
 
     # Concatenation Layer
-    concat_out = Concatenate(name="Concatenate")([text_embedding, pos1_embedding,
-        pos2_embedding])
+    concat_out = Concatenate(name="Concatenate")([text_embedding, 
+        pos1_embedding, pos2_embedding])
 
     # Bidirectional LSTM Layers
-    lstm_out = Bidirectional(LSTM(lstm_units, dropout=0.7), name="BidirectionalLSTM"
-        )(concat_out)
+    lstm_out = Bidirectional(LSTM(lstm_units, dropout=0.7), name=
+        "BidirectionalLSTM")(concat_out)
     out = Dense(num_labels, activation=activation, name="FullyConnected")(
         lstm_out)
     
@@ -66,7 +66,7 @@ def create_RelExLSTM(text_embed_size: int, pos_embed_size: int,
         outputs=out
     )
 
-def create_vectoriser(corpus, vocab_size, max_len, use_vocab):
+def create_vectoriser(corpus, vocab_size, max_len, use_vocab) -> Model:
     """
         Constructs a `tf.keras.layers.TextVectorization` layer for
         preprocessing text for the LSTM model.
@@ -89,7 +89,7 @@ def create_vectoriser(corpus, vocab_size, max_len, use_vocab):
 
         Returns
         -------
-        `tf.keras.layers.TextVectorization`
+        `tf.keras.Model`
             A `tf.keras.layers.TextVectorization` layer.
         `np.ndarray`
             The vocabulary used by the
@@ -109,10 +109,18 @@ def create_vectoriser(corpus, vocab_size, max_len, use_vocab):
         # Trains vectoriser on corpus
         vectoriser.adapt(corpus)
     
-    return vectoriser, vectoriser.get_vocabulary()
+    text_input = Input(shape=(1,), dtype=tf.string, name="TextInput")
+    out = vectoriser(text_input)
 
-def create_RelExLSTM_with_vectoriser(lstm: Model, vectoriser: 
-    TextVectorization, max_len: int):
+    model = Model(
+        inputs=text_input,
+        outputs=out
+    )
+
+    return model, vectoriser.get_vocabulary()
+
+def create_RelExLSTM_with_vectoriser(lstm: Model, vectoriser: Model, max_len:
+    int) -> Model:
     """
     Constructs a Bidirectional LSTM neural network with a preprocessing
     `tf.keras.layers.TextVectorization` layer, desgined for identifying
@@ -122,8 +130,8 @@ def create_RelExLSTM_with_vectoriser(lstm: Model, vectoriser:
     ----------
     `lstm`: `tf.keras.Model`
         RelExLSTM model.
-    `vectoriser`: `tf.keras.layers.TextVectorization`
-        Text vectorisation layer.
+    `vectoriser`: `tf.keras.Model`
+        Text vectorisation layer, wrapped in a `tf.keras.Model`.
     `max_len`: `int`
         Maximum number of tokens allowed in a sentence.
 
