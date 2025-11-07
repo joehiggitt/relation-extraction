@@ -73,7 +73,7 @@ The command line interface has the following options:
 #### Creating New Model
 `model2.py` can be used to instanstiate an LSTM. The following code shows how a model can created and used.
 
-```
+```python
 from model2 import create_RelExLSTM, create_vectoriser, 
 
 MAX_LEN = 100
@@ -104,7 +104,7 @@ full_model = create_RelExLSTM_with_vectoriser(model, vectoriser, max_len=MAX_LEN
 #### Loading Pre-Trained Model
 A pre-trained model can also be loaded into code as follows:
 
-```
+```python
 from tensorflow.keras.models import load_model
 
 model_filepath = ...
